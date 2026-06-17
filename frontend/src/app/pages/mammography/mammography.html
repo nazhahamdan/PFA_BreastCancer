@@ -1,0 +1,212 @@
+<div class="page-container">
+
+  <!-- NAVBAR -->
+  <nav class="dash-nav">
+  <div class="nav-logo">
+    <span class="logo-icon">♥</span>
+    PinkCare
+  </div>
+    <div class="nav-links">
+      <a href="dashboard">Dashboard</a>
+      <a href="analyse" class="active">Mammographie</a>
+      <a href="dashboard">Diagnostic</a>
+    </div>
+    <div class="nav-user">
+      <button class="btn-logout" [routerLink]="['#']" routerLinkActive="router-link-active" >Déconnexion</button>
+    </div>
+  </nav>
+
+  <div class="page-body">
+
+    <!-- TITRE -->
+    <div class="page-header">
+      <h1>Analyse Mammographique</h1>
+      <p>Téléchargez une image mammographique pour obtenir une analyse par intelligence artificielle</p>
+    </div>
+
+    <div class="content-grid">
+
+      <!-- COLONNE GAUCHE : UPLOAD + RÉSULTAT -->
+      <div class="left-col">
+
+        <!-- ZONE UPLOAD -->
+        <div class="upload-card">
+          <h2>📤 Télécharger une image</h2>
+
+          <div
+            class="drop-zone"
+            [class.has-image]="imagePreview"
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop($event)"
+            (click)="fileInput.click()"
+          >
+            <input
+              #fileInput
+              type="file"
+              accept="image/*"
+              style="display:none"
+              (change)="onImageSelect($event)"
+            />
+
+            <ng-container *ngIf="!imagePreview">
+              <div class="drop-icon">🖼️</div>
+              <p class="drop-text">Glissez-déposez votre image ici</p>
+              <p class="drop-subtext">ou cliquez pour sélectionner</p>
+              <p class="drop-formats">Formats acceptés : JPG, PNG, DICOM</p>
+            </ng-container>
+
+            <ng-container *ngIf="imagePreview">
+              <img [src]="imagePreview" alt="Image sélectionnée" class="preview-img" />
+            </ng-container>
+          </div>
+
+          <div class="upload-actions" *ngIf="imageSelectionnee">
+            <span class="file-name">📎 {{ imageSelectionnee.name }}</span>
+            <div class="action-buttons">
+              <button class="btn-secondary" (click)="reinitialiser()">✕ Supprimer</button>
+              <button
+                class="btn-primary"
+                (click)="analyser()"
+                [disabled]="enChargement"
+              >
+                <span *ngIf="!enChargement">Analyser</span>
+                <span *ngIf="enChargement" class="spinner">⏳ Analyse en cours...</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- RÉSULTAT ANALYSE -->
+        <div class="result-card" *ngIf="resultat" [class.cancer]="resultat.resultat === 'CANCER'" [class.normal]="resultat.resultat === 'NORMAL'">
+
+          <div class="result-header">
+            <div class="result-icon">
+              {{ resultat.resultat === 'CANCER' ? '🔴' : '✅' }}
+            </div>
+            <div>
+              <h2 class="result-title">
+                {{ resultat.resultat === 'CANCER' ? 'Anomalie détectée' : 'Aucune anomalie détectée' }}
+              </h2>
+              <p class="result-subtitle">
+                {{ resultat.resultat === 'CANCER' ? 'Consultez un médecin immédiatement' : 'Continuez vos contrôles réguliers' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- BARRE DE CONFIANCE -->
+          <div class="confidence-section">
+            <div class="confidence-label">
+              <span>Niveau de confiance IA</span>
+              <span class="confidence-pct">{{ getConfidencePct() }}</span>
+            </div>
+            <div class="confidence-bar">
+              <div
+                class="confidence-fill"
+                [style.width]="getConfidencePct()"
+                [class.fill-cancer]="resultat.resultat === 'CANCER'"
+                [class.fill-normal]="resultat.resultat === 'NORMAL'"
+              ></div>
+            </div>
+          </div>
+
+          <!-- DÉTAILS -->
+          <div class="result-details">
+            <p>{{ resultat.details }}</p>
+          </div>
+
+          <!-- AVERTISSEMENT SI CANCER -->
+          <div class="warning-box" *ngIf="resultat.resultat === 'CANCER'">
+            ⚠️ Ce résultat est basé sur une analyse IA et ne remplace pas un diagnostic médical professionnel. Consultez un spécialiste dès que possible.
+          </div>
+
+        </div>
+
+        <!-- LOADING -->
+        <div class="loading-card" *ngIf="enChargement">
+          <div class="loading-animation">
+            <div class="pulse-ring"></div>
+            <span class="loading-icon">🔬</span>
+          </div>
+          <h3>Analyse en cours...</h3>
+          <p>Notre IA analyse votre image mammographique</p>
+          <div class="loading-steps">
+            <div class="step active">✓ Image reçue</div>
+            <div class="step active">⟳ Prétraitement</div>
+            <div class="step">⟳ Analyse IA</div>
+            <div class="step">⟳ Génération du rapport</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- COLONNE DROITE : INFO + HISTORIQUE -->
+      <div class="right-col">
+
+        <!-- INFO -->
+        <div class="info-card">
+          <h3>Comment ça fonctionne ?</h3>
+          <div class="steps-list">
+            <div class="step-item">
+              <div class="step-num">1</div>
+              <div>
+                <strong>Téléchargez</strong>
+                <p>Importez votre image mammographique (JPG, PNG)</p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">2</div>
+              <div>
+                <strong>Analyse IA</strong>
+                <p>Notre modèle entraîné analyse l'image en quelques secondes</p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">3</div>
+              <div>
+                <strong>Résultat</strong>
+                <p>Obtenez un résultat avec un score de confiance</p>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">4</div>
+              <div>
+                <strong>Consultation</strong>
+                <p>En cas d'anomalie, consultez un médecin immédiatement</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HISTORIQUE -->
+        <div class="historique-card">
+          <div class="historique-header" (click)="afficherHistorique = !afficherHistorique">
+            <h3>📋 Historique des analyses ({{ historique.length }})</h3>
+            <span>{{ afficherHistorique ? '▲' : '▼' }}</span>
+          </div>
+
+          <div class="historique-list" *ngIf="afficherHistorique">
+            <div *ngIf="historique.length === 0" class="no-data">
+              Aucune analyse précédente
+            </div>
+            <div
+              *ngFor="let h of historique"
+              class="historique-item"
+              [class.item-cancer]="h.resultat === 'CANCER'"
+              [class.item-normal]="h.resultat === 'NORMAL'"
+            >
+              <div class="item-icon">
+                {{ h.resultat === 'CANCER' ? '🔴' : '✅' }}
+              </div>
+              <div class="item-info">
+                <span class="item-resultat">{{ h.resultat }}</span>
+                <span class="item-date">{{ h.dateAnalyse | date:'dd/MM/yyyy HH:mm' }}</span>
+                <span class="item-conf">Confiance : {{ (h.confidence * 100).toFixed(1) }}%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
