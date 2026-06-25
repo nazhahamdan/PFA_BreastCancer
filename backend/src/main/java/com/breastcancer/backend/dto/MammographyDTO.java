@@ -2,6 +2,7 @@ package com.breastcancer.backend.dto;
 
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class MammographyDTO {
@@ -12,4 +13,7 @@ public class MammographyDTO {
     private Double confidence;
     private LocalDateTime dateAnalyse;
     private String details;
+    private String label;                        // ← ajouter
+    private Map<String, Double> probabilites;
+    private String gradcamBase64;
 }

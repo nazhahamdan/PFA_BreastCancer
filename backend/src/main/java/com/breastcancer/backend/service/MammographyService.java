@@ -1,8 +1,12 @@
 package com.breastcancer.backend.service;
 
 import com.breastcancer.backend.dto.MammographyDTO;
+import com.breastcancer.backend.entity.Diagnostic;
 import com.breastcancer.backend.entity.MammographyAnalysis;
 import com.breastcancer.backend.entity.Patient;
+import com.breastcancer.backend.enums.DiagnosticStatus;
+import com.breastcancer.backend.enums.DiagnosticType;
+import com.breastcancer.backend.repository.DiagnosticRepository;
 import com.breastcancer.backend.repository.MammographyRepository;
 import com.breastcancer.backend.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +20,9 @@ import org.springframework.util.MultiValueMap;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,26 +32,38 @@ import java.util.stream.Collectors;
 public class MammographyService {
 
     private final MammographyRepository mammographyRepository;
-    private final PatientRepository patientRepository;
-    private final RestTemplate restTemplate;
+    private final PatientRepository     patientRepository;
+    private final DiagnosticRepository  diagnosticRepository;
+    private final RestTemplate          restTemplate;
 
-    // URL de votre modèle Python Flask/FastAPI
     private static final String AI_MODEL_URL = "http://localhost:5000/predict";
-    private static final String UPLOAD_DIR = "uploads/mammography/";
+    private static final String UPLOAD_DIR   = "uploads/mammography/";
 
-    // Analyser une image
+    @SuppressWarnings("unchecked")
     public MammographyDTO analyserImage(Long patientId, MultipartFile image) throws IOException {
 
-        // 1. Sauvegarder l'image
         String imageUrl = sauvegarderImage(image);
-
-        // 2. Envoyer au modèle IA
         Map<String, Object> prediction = envoyerAuModele(image);
 
-        String resultat = (String) prediction.get("result");       // "CANCER" ou "NORMAL"
-        Double confidence = (Double) prediction.get("confidence"); // ex: 0.92
+        // Utiliser classe_index pour déterminer le résultat correctement
+        int    classeIndex = ((Number) prediction.get("classe_index")).intValue();
+        Double confidence  = ((Number) prediction.get("confidence")).doubleValue();
+        String label       = (String) prediction.get("label");
+        String resultat    = determinerResultat(classeIndex);
 
-        // 3. Sauvegarder en base
+        Map<String, Double> probabilites = new HashMap<>();
+        Map<String, Object> probRaw = (Map<String, Object>) prediction.get("probabilites");
+        if (probRaw != null) {
+            probRaw.forEach((k, v) -> probabilites.put(k, ((Number) v).doubleValue()));
+        }
+
+        // Extraire le Grad-CAM
+        String gradcamBase64 = null;
+        Map<String, Object> gradcamRaw = (Map<String, Object>) prediction.get("gradcam");
+        if (gradcamRaw != null) {
+            gradcamBase64 = (String) gradcamRaw.get("overlay_base64");
+        }
+
         Patient patient = patientRepository.findById(patientId)
                 .orElseThrow(() -> new RuntimeException("Patient non trouvé"));
 
@@ -55,19 +73,69 @@ public class MammographyService {
                 .resultat(resultat)
                 .confidence(confidence)
                 .dateAnalyse(LocalDateTime.now())
-                .details(genererDetails(resultat, confidence))
+                .details(genererDetails(resultat, confidence, label))
+                .label(label)
+                .probabilites(probabilites)
+                .gradcamBase64(gradcamBase64)
                 .build();
+
+        mammographyRepository.save(analysis);
+
+        // Créer un Diagnostic pour le calendrier
+        DiagnosticStatus status = switch (resultat) {
+            case "CANCER" -> DiagnosticStatus.CANCER;
+            case "BENIN"  -> DiagnosticStatus.BON;   // adapter selon ton enum
+            default       -> DiagnosticStatus.BON;
+        };
+
+        Diagnostic diagnostic = Diagnostic.builder()
+                .patient(patient)
+                .type(DiagnosticType.MAMMOGRAPHY_ANALYSIS)
+                .status(status)
+                .date(LocalDate.now())
+                .details(genererDetails(resultat, confidence, label))
+                .imageUrl(imageUrl)
+                .scoreConfidence(confidence * 100)
+                .build();
+
+        diagnosticRepository.save(diagnostic);
 
         return toDTO(mammographyRepository.save(analysis));
     }
 
-    // Récupérer l'historique d'un patient
     public List<MammographyDTO> getHistorique(Long patientId) {
         return mammographyRepository.findByPatientIdOrderByDateAnalyseDesc(patientId)
                 .stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    // Envoyer l'image au modèle Python
+    // ─── Logique de résultat sur 3 niveaux ───────────────────────────────────
+    private String determinerResultat(int classeIndex) {
+        return switch (classeIndex) {
+            case 0      -> "NORMAL";          // Negative
+            case 1, 2   -> "BENIN";           // B. Calc ou B. Mass
+            case 3, 4   -> "CANCER";          // M. Calc ou M. Mass
+            default     -> "NORMAL";
+        };
+    }
+
+    private String genererDetails(String resultat, Double confidence, String label) {
+        return switch (resultat) {
+            case "CANCER" -> String.format(
+                    "Analyse IA : anomalie maligne détectée (%s) avec %.1f%% de confiance. " +
+                            "Consultation médicale urgente recommandée.",
+                    label, confidence * 100);
+            case "BENIN" -> String.format(
+                    "Analyse IA : anomalie bénigne détectée (%s) avec %.1f%% de confiance. " +
+                            "Un suivi médical est recommandé.",
+                    label, confidence * 100);
+            default -> String.format(
+                    "Analyse IA : aucune anomalie détectée (%s) avec %.1f%% de confiance. " +
+                            "Continuez vos contrôles réguliers.",
+                    label, confidence * 100);
+        };
+    }
+
+    // ─── Helpers ─────────────────────────────────────────────────────────────
     @SuppressWarnings("unchecked")
     private Map<String, Object> envoyerAuModele(MultipartFile image) throws IOException {
         HttpHeaders headers = new HttpHeaders();
@@ -83,21 +151,12 @@ public class MammographyService {
         return response.getBody();
     }
 
-    // Sauvegarder l'image sur le serveur
     private String sauvegarderImage(MultipartFile image) throws IOException {
         Path uploadPath = Paths.get(UPLOAD_DIR);
         if (!Files.exists(uploadPath)) Files.createDirectories(uploadPath);
-
         String filename = System.currentTimeMillis() + "_" + image.getOriginalFilename();
         Files.copy(image.getInputStream(), uploadPath.resolve(filename));
         return UPLOAD_DIR + filename;
-    }
-
-    private String genererDetails(String resultat, Double confidence) {
-        if ("CANCER".equals(resultat)) {
-            return String.format("Analyse IA : anomalie détectée avec %.1f%% de confiance. Consultation médicale urgente recommandée.", confidence * 100);
-        }
-        return String.format("Analyse IA : aucune anomalie détectée avec %.1f%% de confiance. Continuez vos contrôles réguliers.", confidence * 100);
     }
 
     private MammographyDTO toDTO(MammographyAnalysis a) {
@@ -109,6 +168,9 @@ public class MammographyService {
                 .confidence(a.getConfidence())
                 .dateAnalyse(a.getDateAnalyse())
                 .details(a.getDetails())
+                .label(a.getLabel())
+                .probabilites(a.getProbabilites())
+                .gradcamBase64(a.getGradcamBase64())
                 .build();
     }
 }

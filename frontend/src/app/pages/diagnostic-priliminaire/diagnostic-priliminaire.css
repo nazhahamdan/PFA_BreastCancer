@@ -1,0 +1,158 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #fdf5f8; color: #333; }
+
+/* NAVBAR */
+.dash-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.875rem 2rem; background: #fff;
+  border-bottom: 1px solid #f0d4df;
+  box-shadow: 0 2px 8px rgba(153,53,86,0.08);
+  position: sticky; top: 0; z-index: 100;
+}
+.nav-logo { display: flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 700; color: #993556; }
+.nav-links { display: flex; gap: 2rem; }
+.nav-links a { font-size: 14px; color: #666; text-decoration: none; }
+.nav-links a.active, .nav-links a:hover { color: #993556; font-weight: 600; }
+.nav-user { display: flex; align-items: center; gap: 12px; }
+.btn-logout { background: transparent; border: 1.5px solid #993556; color: #993556; padding: 6px 14px; border-radius: 6px; font-size: 13px; cursor: pointer; }
+.logo-icon {
+  font-size: 22px;
+  color: #fc7b93;
+  /* La largeur définit la taille de votre image */
+  width: 40px;
+  /* height: auto; permet de garder les proportions de votre logo */
+  height: auto;
+}
+/* PAGE */
+.page-body { padding: 2rem; max-width: 820px; margin: 0 auto; }
+.page-header { text-align: center; margin-bottom: 2rem; }
+.page-header h1 { font-size: 28px; font-weight: 700; color: #993556; margin-bottom: 6px; }
+.page-header p { font-size: 15px; color: #777; }
+
+/* PROGRESSION */
+.progress-section { margin-bottom: 1.5rem; }
+.progress-info { display: flex; justify-content: space-between; font-size: 13px; color: #666; margin-bottom: 8px; }
+.progress-bar { height: 8px; background: #f0d4df; border-radius: 10px; overflow: hidden; margin-bottom: 1.5rem; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #f4b8cb, #993556); border-radius: 10px; transition: width 0.4s ease; }
+
+/* ÉTAPES NAV */
+.steps-nav { display: flex; justify-content: space-between; gap: 8px; }
+.step-dot {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 10px 6px; border-radius: 10px; border: 2px solid #f0d4df;
+  background: #fff; transition: all 0.2s; cursor: default;
+}
+.step-dot.active { border-color: #993556; background: #fbeaf0; }
+.step-dot.done { border-color: #c8e6c9; background: #f5fff7; }
+.dot-icone { font-size: 20px; }
+.dot-label { font-size: 11px; color: #666; text-align: center; font-weight: 600; }
+.step-dot.active .dot-label { color: #993556; }
+.step-dot.done .dot-label { color: #2e7d32; }
+
+/* CARD QUESTIONS */
+.questions-card {
+  background: #fff; border-radius: 16px; border: 1px solid #f0d4df;
+  padding: 2rem; box-shadow: 0 2px 12px rgba(153,53,86,0.07);
+}
+.questions-header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.75rem; }
+.etape-icone { font-size: 36px; }
+.questions-header h2 { font-size: 20px; font-weight: 700; color: #993556; margin-bottom: 4px; }
+.questions-header p { font-size: 13px; color: #777; line-height: 1.5; }
+
+/* QUESTIONS */
+.questions-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 1.25rem; }
+.question-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; border-radius: 10px;
+  border: 2px solid #f0d4df; background: #fdf5f8;
+  cursor: pointer; transition: all 0.2s;
+}
+.question-item:hover { border-color: #993556; background: #fbeaf0; }
+.question-item.selected { border-color: #993556; background: #fbeaf0; }
+
+.question-checkbox {
+  width: 24px; height: 24px; border-radius: 6px;
+  border: 2px solid #f4b8cb; background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: #993556;
+  flex-shrink: 0; transition: all 0.2s;
+}
+.question-checkbox.checked { background: #993556; border-color: #993556; color: white; }
+.question-texte { font-size: 14px; color: #333; line-height: 1.5; }
+.question-hint { font-size: 12px; color: #aaa; text-align: center; margin-bottom: 1.5rem; }
+
+/* NAVIGATION */
+.nav-buttons { display: flex; justify-content: space-between; align-items: center; }
+.btn-primary {
+  background: #993556; color: white; border: none;
+  padding: 12px 28px; border-radius: 10px;
+  font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+}
+.btn-primary:hover { background: #72243E; }
+.btn-secondary {
+  background: #fbeaf0; color: #993556; border: 1px solid #f4b8cb;
+  padding: 12px 24px; border-radius: 10px;
+  font-size: 15px; cursor: pointer;
+}
+
+/* ══════════ RÉSULTAT ══════════ */
+.resultat-container { display: flex; flex-direction: column; gap: 1.5rem; }
+
+.score-card {
+  background: #fff; border-radius: 16px; padding: 2.5rem;
+  text-align: center; border: 2px solid #f0d4df;
+  box-shadow: 0 2px 12px rgba(153,53,86,0.07);
+}
+.score-card.score-danger { border-color: #ffcdd2; background: linear-gradient(135deg, #fff5f5, #fff); }
+.score-card.score-warning { border-color: #fff176; background: linear-gradient(135deg, #fffde7, #fff); }
+.score-card.score-ok { border-color: #c8e6c9; background: linear-gradient(135deg, #f5fff7, #fff); }
+
+.score-icone { font-size: 52px; margin-bottom: 10px; }
+.score-valeur { font-size: 64px; font-weight: 800; color: #993556; line-height: 1; }
+.score-valeur span { font-size: 24px; color: #aaa; }
+.score-message { font-size: 18px; font-weight: 600; color: #333; margin: 12px 0 1.5rem; }
+
+/* JAUGE */
+.jauge-container { margin: 0 auto 1.5rem; max-width: 500px; }
+.jauge-bar { height: 16px; background: #f0e0e8; border-radius: 10px; overflow: visible; position: relative; margin-bottom: 6px; }
+.jauge-fill { height: 100%; border-radius: 10px; transition: width 1s ease; }
+.score-danger-fill  { background: linear-gradient(90deg, #ef9a9a, #c62828); }
+.score-warning-fill { background: linear-gradient(90deg, #fff176, #f57f17); }
+.score-ok-fill      { background: linear-gradient(90deg, #a5d6a7, #2e7d32); }
+.jauge-marker { position: absolute; top: -4px; width: 3px; height: 24px; background: #333; border-radius: 2px; transform: translateX(-50%); }
+.jauge-labels { display: flex; justify-content: space-between; font-size: 12px; color: #888; }
+.marker-label { font-weight: 700; color: #333; }
+
+/* ALERTES */
+.alerte-urgente, .alerte-vigilance, .alerte-ok {
+  padding: 14px 18px; border-radius: 10px; font-size: 14px; line-height: 1.6; text-align: left;
+}
+.alerte-urgente  { background: #fff5f5; border: 1px solid #ffcdd2; color: #8B0000; }
+.alerte-vigilance{ background: #fffde7; border: 1px solid #fff176; color: #856404; }
+.alerte-ok       { background: #f5fff7; border: 1px solid #c8e6c9; color: #2e7d32; }
+
+/* SYMPTÔMES */
+.symptomes-card {
+  background: #fff; border-radius: 14px; padding: 1.5rem;
+  border: 1px solid #f0d4df; box-shadow: 0 2px 8px rgba(153,53,86,0.05);
+}
+.symptomes-card h3 { font-size: 16px; font-weight: 700; color: #993556; margin-bottom: 1rem; }
+.symptomes-list { display: flex; flex-direction: column; gap: 8px; }
+.symptome-item { display: flex; align-items: center; gap: 12px; font-size: 14px; color: #444; padding: 8px 12px; background: #fdf5f8; border-radius: 8px; }
+.symptome-score { background: #993556; color: white; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 12px; white-space: nowrap; }
+
+/* AVERTISSEMENT */
+.avertissement-card {
+  background: #fff8e1; border: 1px solid #ffcc02; border-radius: 12px;
+  padding: 1rem 1.25rem; font-size: 13px; color: #555; line-height: 1.6;
+}
+
+/* ACTIONS */
+.resultat-actions { display: flex; gap: 12px; justify-content: center; }
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .steps-nav { gap: 4px; }
+  .dot-label { display: none; }
+  .score-valeur { font-size: 48px; }
+}

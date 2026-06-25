@@ -41,6 +41,10 @@ body {
 .logo-icon {
   font-size: 22px;
   color: #fc7b93;
+  /* La largeur définit la taille de votre image */
+  width: 40px;
+  /* height: auto; permet de garder les proportions de votre logo */
+  height: auto;
 }
 
 .nav-links {

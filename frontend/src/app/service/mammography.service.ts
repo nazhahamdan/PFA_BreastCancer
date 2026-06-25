@@ -3,11 +3,20 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 export interface MammographyResult {
   id: number;
+  patientId: number;
   imageUrl: string;
-  resultat: 'CANCER' | 'NORMAL';
+  resultat: 'CANCER' | 'NORMAL'| 'BENIN';
   confidence: number;
   dateAnalyse: string;
   details: string;
+  label?: string;           // ← ajouter
+  probabilites?: {          // ← ajouter
+    'Negative': number;
+    'B. Calc': number;
+    'B. Mass': number;
+    'M. Calc': number;
+    'M. Mass': number;
+  };
 }
 @Injectable({
   providedIn: 'root',

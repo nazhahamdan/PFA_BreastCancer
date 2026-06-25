@@ -1,36 +1,49 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { CalendrierJourDTO, DiagnosticDTO, DiagnosticService } from '../../service/diagnostic.service';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],   // ← FormsModule ajouté
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
 export class Dashboard implements OnInit {
 
-  patientId = 1; // à remplacer par l'ID du patient connecté
-  currentYear = new Date().getFullYear();
+  patientId = 1;
+  currentYear  = new Date().getFullYear();
   currentMonth = new Date().getMonth() + 1;
 
-  joursCalendrier: CalendrierJourDTO[] = [];
-  jourSelectionne: CalendrierJourDTO | null = null;
+  joursCalendrier: CalendrierJourDTO[]       = [];
+  jourSelectionne: CalendrierJourDTO | null  = null;
   diagnosticSelectionne: DiagnosticDTO | null = null;
 
   moisNoms = ['Janvier','Février','Mars','Avril','Mai','Juin',
                'Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 
   joursGrid: (CalendrierJourDTO | null)[] = [];
-  premierJourMois = 0;
-  nombreJoursMois = 0;
+
+  // ── Formulaire ──────────────────────────────────────────
+  afficherFormulaire = false;
+  enSauvegarde       = false;
+  messageSucces      = '';
+
+  nouveauDiagnostic: Partial<DiagnosticDTO> = {
+    type          : 'DOCTOR_CONSULTATION',
+    status        : 'BON',
+    date          : new Date().toISOString().split('T')[0] as any,
+    nomMedecin    : '',
+    resultatMedecin: '',
+    notesMedecin  : '',
+    details       : '',
+  };
 
   constructor(private diagnosticService: DiagnosticService) {}
 
-  ngOnInit() {
-    this.chargerCalendrier();
-  }
+  ngOnInit() { this.chargerCalendrier(); }
 
+  // ── Calendrier ──────────────────────────────────────────
   chargerCalendrier() {
     this.diagnosticService.getCalendrier(this.patientId, this.currentYear, this.currentMonth)
       .subscribe(data => {
@@ -41,18 +54,12 @@ export class Dashboard implements OnInit {
 
   construireGrille() {
     const date = new Date(this.currentYear, this.currentMonth - 1, 1);
-    this.premierJourMois = (date.getDay() + 6) % 7; // Lundi = 0
-    this.nombreJoursMois = new Date(this.currentYear, this.currentMonth, 0).getDate();
+    const premierJour = (date.getDay() + 6) % 7;
+    const nombreJours = new Date(this.currentYear, this.currentMonth, 0).getDate();
 
     this.joursGrid = [];
-
-    // Cases vides avant le 1er jour
-    for (let i = 0; i < this.premierJourMois; i++) {
-      this.joursGrid.push(null);
-    }
-
-    // Cases pour chaque jour
-    for (let jour = 1; jour <= this.nombreJoursMois; jour++) {
+    for (let i = 0; i < premierJour; i++) this.joursGrid.push(null);
+    for (let jour = 1; jour <= nombreJours; jour++) {
       const dateStr = `${this.currentYear}-${String(this.currentMonth).padStart(2,'0')}-${String(jour).padStart(2,'0')}`;
       const jourData = this.joursCalendrier.find(j => j.date === dateStr) || null;
       this.joursGrid.push(jourData ?? { date: dateStr, couleur: 'NONE' as any, nombreDiagnostics: 0, diagnostics: [] });
@@ -60,23 +67,15 @@ export class Dashboard implements OnInit {
   }
 
   moisPrecedent() {
-    if (this.currentMonth === 1) {
-      this.currentMonth = 12;
-      this.currentYear--;
-    } else {
-      this.currentMonth--;
-    }
+    if (this.currentMonth === 1) { this.currentMonth = 12; this.currentYear--; }
+    else this.currentMonth--;
     this.jourSelectionne = null;
     this.chargerCalendrier();
   }
 
   moisSuivant() {
-    if (this.currentMonth === 12) {
-      this.currentMonth = 1;
-      this.currentYear++;
-    } else {
-      this.currentMonth++;
-    }
+    if (this.currentMonth === 12) { this.currentMonth = 1; this.currentYear++; }
+    else this.currentMonth++;
     this.jourSelectionne = null;
     this.chargerCalendrier();
   }
@@ -88,10 +87,49 @@ export class Dashboard implements OnInit {
     }
   }
 
-  selectionnerDiagnostic(d: DiagnosticDTO) {
-    this.diagnosticSelectionne = d;
+  selectionnerDiagnostic(d: DiagnosticDTO) { this.diagnosticSelectionne = d; }
+
+  // ── Formulaire ──────────────────────────────────────────
+  ouvrirFormulaire() {
+    this.afficherFormulaire = true;
+    this.messageSucces      = '';
+    this.nouveauDiagnostic  = {
+      type           : 'DOCTOR_CONSULTATION',
+      status         : 'BON',
+      date           : new Date().toISOString().split('T')[0] as any,
+      nomMedecin     : '',
+      resultatMedecin: '',
+      notesMedecin   : '',
+      details        : '',
+    };
   }
 
+  fermerFormulaire() {
+    this.afficherFormulaire = false;
+    this.messageSucces      = '';
+  }
+
+  sauvegarderDiagnostic() {
+    if (!this.nouveauDiagnostic.nomMedecin?.trim()) return;
+
+    this.enSauvegarde = true;
+
+    this.diagnosticService.ajouterDiagnostic(this.patientId, this.nouveauDiagnostic)
+      .subscribe({
+        next: () => {
+          this.enSauvegarde      = false;
+          this.messageSucces     = ' Consultation enregistrée avec succès !';
+          this.chargerCalendrier();             // rafraîchir le calendrier
+          setTimeout(() => this.fermerFormulaire(), 1500);
+        },
+        error: () => {
+          this.enSauvegarde  = false;
+          this.messageSucces = '❌ Erreur lors de l\'enregistrement.';
+        }
+      });
+  }
+
+  // ── Helpers ─────────────────────────────────────────────
   getCouleurClass(couleur: string): string {
     switch (couleur) {
       case 'BABY_PINK':   return 'jour-baby-pink';
@@ -104,24 +142,21 @@ export class Dashboard implements OnInit {
 
   getTypeLabel(type: string): string {
     switch (type) {
-      case 'SYMPTOM_DIAGNOSTIC':  return '🩺 Diagnostic symptômes';
+      case 'SYMPTOM_DIAGNOSTIC':   return '🩺 Diagnostic symptômes';
       case 'MAMMOGRAPHY_ANALYSIS': return '🔬 Analyse mammographique';
-      case 'DOCTOR_CONSULTATION': return '👨‍⚕️ Consultation médecin';
+      case 'DOCTOR_CONSULTATION':  return '👨‍⚕️ Consultation médecin';
       default: return type;
     }
   }
 
   getStatusLabel(status: string): string {
     switch (status) {
-      case 'BON':     return '✅ Bon';
+      case 'BON':     return '🟢 Bon';
       case 'SUSPECT': return '⚠️ Suspect';
       case 'CANCER':  return '🔴 Cancer détecté';
       default: return status;
     }
   }
 
-  get moisActuelNom(): string {
-    return this.moisNoms[this.currentMonth - 1];
-  }
-
+  get moisActuelNom(): string { return this.moisNoms[this.currentMonth - 1]; }
 }

@@ -2,17 +2,18 @@
 
   <!-- NAVBAR -->
   <nav class="dash-nav">
-  <div class="nav-logo">
-    <span class="logo-icon">♥</span>
-    PinkCare
-  </div>
+    <div class="nav-logo">
+      <img src="PinkCare-logo.ico" class="logo-icon">
+      PinkCare
+    </div>
     <div class="nav-links">
       <a href="dashboard">Dashboard</a>
       <a href="analyse" class="active">Mammographie</a>
-      <a href="dashboard">Diagnostic</a>
+      <a href="diagnostic">Diagnostic</a>
+      <a href="notification">Notification</a>
     </div>
     <div class="nav-user">
-      <button class="btn-logout" [routerLink]="['#']" routerLinkActive="router-link-active" >Déconnexion</button>
+      <button class="btn-logout" [routerLink]="['#']">Déconnexion</button>
     </div>
   </nav>
 
@@ -26,7 +27,7 @@
 
     <div class="content-grid">
 
-      <!-- COLONNE GAUCHE : UPLOAD + RÉSULTAT -->
+      <!-- ═══════════════ COLONNE GAUCHE ═══════════════ -->
       <div class="left-col">
 
         <!-- ZONE UPLOAD -->
@@ -52,7 +53,7 @@
               <div class="drop-icon">🖼️</div>
               <p class="drop-text">Glissez-déposez votre image ici</p>
               <p class="drop-subtext">ou cliquez pour sélectionner</p>
-              <p class="drop-formats">Formats acceptés : JPG, PNG, DICOM</p>
+              <p class="drop-formats">Formats acceptés : JPG, PNG</p>
             </ng-container>
 
             <ng-container *ngIf="imagePreview">
@@ -64,61 +65,12 @@
             <span class="file-name">📎 {{ imageSelectionnee.name }}</span>
             <div class="action-buttons">
               <button class="btn-secondary" (click)="reinitialiser()">✕ Supprimer</button>
-              <button
-                class="btn-primary"
-                (click)="analyser()"
-                [disabled]="enChargement"
-              >
+              <button class="btn-primary" (click)="analyser()" [disabled]="enChargement">
                 <span *ngIf="!enChargement">Analyser</span>
-                <span *ngIf="enChargement" class="spinner">⏳ Analyse en cours...</span>
+                <span *ngIf="enChargement">⏳ Analyse en cours...</span>
               </button>
             </div>
           </div>
-        </div>
-
-        <!-- RÉSULTAT ANALYSE -->
-        <div class="result-card" *ngIf="resultat" [class.cancer]="resultat.resultat === 'CANCER'" [class.normal]="resultat.resultat === 'NORMAL'">
-
-          <div class="result-header">
-            <div class="result-icon">
-              {{ resultat.resultat === 'CANCER' ? '🔴' : '✅' }}
-            </div>
-            <div>
-              <h2 class="result-title">
-                {{ resultat.resultat === 'CANCER' ? 'Anomalie détectée' : 'Aucune anomalie détectée' }}
-              </h2>
-              <p class="result-subtitle">
-                {{ resultat.resultat === 'CANCER' ? 'Consultez un médecin immédiatement' : 'Continuez vos contrôles réguliers' }}
-              </p>
-            </div>
-          </div>
-
-          <!-- BARRE DE CONFIANCE -->
-          <div class="confidence-section">
-            <div class="confidence-label">
-              <span>Niveau de confiance IA</span>
-              <span class="confidence-pct">{{ getConfidencePct() }}</span>
-            </div>
-            <div class="confidence-bar">
-              <div
-                class="confidence-fill"
-                [style.width]="getConfidencePct()"
-                [class.fill-cancer]="resultat.resultat === 'CANCER'"
-                [class.fill-normal]="resultat.resultat === 'NORMAL'"
-              ></div>
-            </div>
-          </div>
-
-          <!-- DÉTAILS -->
-          <div class="result-details">
-            <p>{{ resultat.details }}</p>
-          </div>
-
-          <!-- AVERTISSEMENT SI CANCER -->
-          <div class="warning-box" *ngIf="resultat.resultat === 'CANCER'">
-            ⚠️ Ce résultat est basé sur une analyse IA et ne remplace pas un diagnostic médical professionnel. Consultez un spécialiste dès que possible.
-          </div>
-
         </div>
 
         <!-- LOADING -->
@@ -137,9 +89,121 @@
           </div>
         </div>
 
+        <!-- RÉSULTAT ANALYSE -->
+        <div class="result-card"
+             *ngIf="resultat && !enChargement"
+             [class.cancer]="resultat.resultat === 'CANCER'"
+             [class.benin]="resultat.resultat === 'BENIN'"
+             [class.normal]="resultat.resultat === 'NORMAL'">
+
+          <div class="result-header">
+            <div class="result-icon">
+              {{ resultat.resultat === 'CANCER' ? '🔴' : resultat.resultat === 'BENIN' ? '🟡' : '🟢' }}
+            </div>
+            <div>
+              <h2 class="result-title">
+                {{ resultat.resultat === 'CANCER' ? 'Anomalie maligne détectée'
+                : resultat.resultat === 'BENIN'  ? 'Anomalie bénigne détectée'
+                :                                  'Aucune anomalie détectée' }}
+              </h2>
+              <p class="result-label-ia">
+                Classification IA : <strong>{{ resultat.label }}</strong>
+              </p>
+              <p class="result-subtitle">
+                {{ resultat.resultat === 'CANCER' ? 'Consultez un médecin immédiatement'
+                : resultat.resultat === 'BENIN'  ? 'Un suivi médical est recommandé'
+                :                                  'Continuez vos contrôles réguliers' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- BARRE DE CONFIANCE -->
+          <div class="confidence-section">
+            <div class="confidence-label">
+              <span>Niveau de confiance IA</span>
+              <span class="confidence-pct">{{ getConfidencePct() }}</span>
+            </div>
+            <div class="confidence-bar">
+              <div
+                class="confidence-fill"
+                [style.width]="getConfidencePct()"
+                [class.fill-cancer]="resultat.resultat === 'CANCER'"
+                [class.fill-benin]="resultat.resultat === 'BENIN'"
+                [class.fill-normal]="resultat.resultat === 'NORMAL'"
+              ></div>
+            </div>
+          </div>
+
+          <!-- PROBABILITÉS PAR CLASSE -->
+          <div class="probabilites-section" *ngIf="resultat.probabilites">
+            <h4>Détail par classe</h4>
+            <div class="prob-row" *ngFor="let classe of getClasses()">
+              <span class="prob-label" [class.prob-highlight]="classe === resultat.label">
+                {{ classe }}
+              </span>
+              <div class="prob-bar-bg">
+                <div class="prob-bar-fill"
+                     [style.width.%]="getProbPct(classe)"
+                     [class.prob-fill-cancer]="isMalignant(classe)"
+                     [class.prob-fill-benin]="isBenin(classe)"
+                     [class.prob-fill-normal]="isNegative(classe)">
+                </div>
+              </div>
+              <span class="prob-pct">{{ getProbPct(classe).toFixed(1) }}%</span>
+            </div>
+          </div>
+
+          <!-- DÉTAILS -->
+          <div class="result-details">
+            <p>{{ resultat.details }}</p>
+          </div>
+
+          <!-- AVERTISSEMENTS -->
+          <div class="warning-box warning-cancer" *ngIf="resultat.resultat === 'CANCER'">
+            ⚠️ Anomalie maligne détectée. Ce résultat ne remplace pas un diagnostic médical professionnel.
+            Consultez un spécialiste immédiatement.
+          </div>
+
+          <div class="warning-box warning-benin" *ngIf="resultat.resultat === 'BENIN'">
+            ℹ️ Une anomalie bénigne a été détectée. Un suivi médical régulier est conseillé.
+            Consultez votre médecin pour confirmer ce résultat.
+          </div>
+
+        </div>
+
+        <!-- ═══ GRAD-CAM ═══════════════════════════════════════════════════ -->
+        <div class="gradcam-card" *ngIf="gradcamUrl && !enChargement">
+          <div class="gradcam-header">
+            <h3>🔍 Interprétabilité — Grad-CAM</h3>
+            <span class="gradcam-badge">IA explicable</span>
+          </div>
+          <p class="gradcam-hint">
+            Les zones
+            <span class="hot-zone">rouges / jaunes</span>
+            sont les régions de l'image les plus déterminantes pour la prédiction de l'IA.
+            Les zones
+            <span class="cold-zone">bleues</span>
+            ont eu peu d'influence.
+          </p>
+          <div class="gradcam-images">
+            <div class="gradcam-img-block">
+              <p class="gradcam-img-label">Image originale</p>
+              <img [src]="imagePreview" alt="Image originale" class="gradcam-img" />
+            </div>
+            <div class="gradcam-img-block">
+              <p class="gradcam-img-label">Carte de chaleur Grad-CAM</p>
+              <img [src]="gradcamUrl" alt="Heatmap Grad-CAM" class="gradcam-img" />
+            </div>
+          </div>
+          <p class="gradcam-disclaimer">
+            ℹ️ Cette visualisation est fournie à titre indicatif et ne constitue pas un diagnostic médical.
+          </p>
+        </div>
+        <!-- ═══ FIN GRAD-CAM ══════════════════════════════════════════════ -->
+
       </div>
 
-      <!-- COLONNE DROITE : INFO + HISTORIQUE -->
+      <!-- ═══════════════ COLONNE DROITE ═══════════════ -->
       <div class="right-col">
 
         <!-- INFO -->
@@ -192,10 +256,11 @@
               *ngFor="let h of historique"
               class="historique-item"
               [class.item-cancer]="h.resultat === 'CANCER'"
+              [class.item-benin]="h.resultat === 'BENIN'"
               [class.item-normal]="h.resultat === 'NORMAL'"
             >
               <div class="item-icon">
-                {{ h.resultat === 'CANCER' ? '🔴' : '✅' }}
+                {{ h.resultat === 'CANCER' ? '🔴' : h.resultat === 'BENIN' ? '🟡' : '🟢' }}
               </div>
               <div class="item-info">
                 <span class="item-resultat">{{ h.resultat }}</span>
@@ -207,6 +272,8 @@
         </div>
 
       </div>
+      <!-- ═══════════════ FIN COLONNE DROITE ═══════════════ -->
+
     </div>
   </div>
 </div>

@@ -1,0 +1,170 @@
+
+<div class="page-container">
+
+  <!-- NAVBAR -->
+  <nav class="dash-nav">
+    <div class="nav-logo">
+  <img src="PinkCare-logo.ico" class="logo-icon">
+  PinkCare
+</div>
+    <div class="nav-links">
+      <a href="dashboard">Dashboard</a>
+      <a href="analyse">Mammographie</a>
+      <a href="diagnostic" class="active">Diagnostic</a>
+      <a href="notification">Notification</a>
+    </div>
+    <div class="nav-user">
+      <button class="btn-logout">Déconnexion</button>
+    </div>
+  </nav>
+
+  <div class="page-body">
+
+    <div class="page-header">
+      <h1>Diagnostic Préliminaire</h1>
+      <p>Répondez honnêtement à ces questions pour évaluer votre état de santé</p>
+    </div>
+
+    <!-- ══════════ FORMULAIRE ══════════ -->
+    <div class="diagnostic-container" *ngIf="!termine">
+
+      <!-- BARRE DE PROGRESSION -->
+      <div class="progress-section">
+        <div class="progress-info">
+          <span>Étape {{ etapeActuelle + 1 }} sur {{ etapes.length }}</span>
+          <span>{{ progression }}% complété</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width.%]="progression"></div>
+        </div>
+
+        <!-- ÉTAPES VISUELLES -->
+        <div class="steps-nav">
+          <div
+            *ngFor="let e of etapes; let i = index"
+            class="step-dot"
+            [class.active]="i === etapeActuelle"
+            [class.done]="i < etapeActuelle"
+          >
+            <span class="dot-icone">{{ i < etapeActuelle ? '✓' : e.icone }}</span>
+            <span class="dot-label">{{ e.titre }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUESTIONS -->
+      <div class="questions-card">
+        <div class="questions-header">
+          <span class="etape-icone">{{ etape.icone }}</span>
+          <div>
+            <h2>{{ etape.titre }}</h2>
+            <p>{{ etape.description }}</p>
+          </div>
+        </div>
+
+        <div class="questions-list">
+          <div
+            *ngFor="let q of etape.questions"
+            class="question-item"
+            [class.selected]="q.reponse"
+            (click)="q.reponse = !q.reponse"
+          >
+            <div class="question-checkbox" [class.checked]="q.reponse">
+              {{ q.reponse ? '✓' : '' }}
+            </div>
+            <span class="question-texte">{{ q.texte }}</span>
+          </div>
+        </div>
+
+        <p class="question-hint">
+          💡 Cliquez sur une question pour indiquer si vous présentez ce symptôme
+        </p>
+
+        <!-- NAVIGATION -->
+        <div class="nav-buttons">
+          <button class="btn-secondary" (click)="etapePrecedente()" *ngIf="etapeActuelle > 0">
+            ← Précédent
+          </button>
+          <div *ngIf="etapeActuelle === 0"></div>
+
+          <button class="btn-primary" (click)="etapeSuivante()">
+            {{ etapeActuelle === etapes.length - 1 ? 'Voir mon résultat →' : 'Suivant →' }}
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══════════ RÉSULTAT ══════════ -->
+    <div class="resultat-container" *ngIf="termine">
+
+      <!-- SCORE -->
+      <div class="score-card" [class]="scoreClass">
+        <div class="score-icone">{{ scoreIcone }}</div>
+        <div class="score-valeur">{{ scoreTotal }}<span>/100</span></div>
+        <h2 class="score-message">{{ scoreMessage }}</h2>
+
+        <!-- JAUGE -->
+        <div class="jauge-container">
+          <div class="jauge-bar">
+            <div class="jauge-fill" [style.width.%]="scoreTotal" [class]="scoreClass + '-fill'"></div>
+            <div class="jauge-marker" style="left: 50%"></div>
+          </div>
+          <div class="jauge-labels">
+            <span>0</span>
+            <span class="marker-label">Seuil 50</span>
+            <span>100</span>
+          </div>
+        </div>
+
+        <!-- MESSAGE URGENT -->
+        <div class="alerte-urgente" *ngIf="scoreTotal >= 50">
+          🚨 Votre score dépasse le seuil d'alerte. Consultez un médecin ou un spécialiste
+          dès que possible. Ne tardez pas.
+        </div>
+
+        <div class="alerte-vigilance" *ngIf="scoreTotal >= 25 && scoreTotal < 50">
+          ⚠️ Certains symptômes méritent attention. Prenez rendez-vous avec votre médecin
+          prochainement pour un bilan.
+        </div>
+
+        <div class="alerte-ok" *ngIf="scoreTotal < 25">
+          Aucun signe d'alerte majeur détecté. Continuez vos contrôles réguliers
+          et consultez si de nouveaux symptômes apparaissent.
+        </div>
+      </div>
+
+      <!-- SYMPTÔMES COCHÉS -->
+      <div class="symptomes-card" *ngIf="symptoesCoches.length > 0">
+        <h3>📋 Symptômes que vous avez signalés</h3>
+        <div class="symptomes-list">
+          <div *ngFor="let q of symptoesCoches" class="symptome-item">
+            <span class="symptome-score">+{{ q.score }}</span>
+            <span>{{ q.texte }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="symptomes-card" *ngIf="symptoesCoches.length === 0">
+        <h3>Aucun symptôme signalé</h3>
+        <p style="color:#777; font-size:14px; margin-top:8px">
+          Vous n'avez coché aucun symptôme. Continuez à faire vos contrôles réguliers.
+        </p>
+      </div>
+
+      <!-- AVERTISSEMENT MÉDICAL -->
+      <div class="avertissement-card">
+        ⚕️ <strong>Important :</strong> Ce diagnostic préliminaire est un outil d'aide
+        à la décision basé sur vos symptômes déclarés. Il ne remplace en aucun cas
+        un examen médical professionnel. Seul un médecin peut établir un diagnostic définitif.
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="resultat-actions">
+        <button class="btn-secondary" (click)="recommencer()">🔄 Recommencer</button>
+        <button class="btn-primary" (click)="allerDashboard()">📋 Voir mon tableau de bord</button>
+      </div>
+
+    </div>
+  </div>
+</div>

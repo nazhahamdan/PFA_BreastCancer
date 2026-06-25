@@ -28,6 +28,14 @@ body {
   font-weight: 700;
   color: #993556;
 }
+.logo-icon {
+  font-size: 22px;
+  color: #fc7b93;
+  /* La largeur définit la taille de votre image */
+  width: 40px;
+  /* height: auto; permet de garder les proportions de votre logo */
+  height: auto;
+}
 
 .logo-ribbon { width: 28px; height: 36px; object-fit: contain; }
 
@@ -342,4 +350,164 @@ body {
 @media (max-width: 900px) {
   .main-content { flex-direction: column; }
   .detail-panel { width: 100%; }
+}
+
+
+/* LÉGENDE + BOUTON */
+.legend-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.btn-ajouter {
+  background: #993556;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btn-ajouter:hover { background: #72243E; }
+
+/* MODALE */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-box {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f0d4df;
+}
+
+.modal-header h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #993556;
+}
+
+.modal-body { padding: 1.5rem; }
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #f0d4df;
+}
+
+/* FORMULAIRE */
+.form-group {
+  margin-bottom: 1.1rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.required { color: #993556; }
+
+.form-input {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid #f0d4df;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.form-input:focus { border-color: #993556; }
+
+.form-textarea { resize: vertical; }
+
+/* BOUTONS STATUT */
+.status-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.status-btn {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.status-btn.bon     { background: #f5fff7; color: #2e7d32; border-color: #c8e6c9; }
+.status-btn.suspect { background: #fffde7; color: #f57f17; border-color: #fff176; }
+.status-btn.cancer  { background: #fff5f5; color: #8B0000; border-color: #ffcdd2; }
+
+.status-btn.bon.active     { background: #2e7d32; color: white; }
+.status-btn.suspect.active { background: #f57f17; color: white; }
+.status-btn.cancer.active  { background: #8B0000; color: white; }
+
+/* BOUTONS FOOTER */
+.btn-primary {
+  background: #993556;
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn-primary:hover:not(:disabled) { background: #72243E; }
+
+.btn-secondary {
+  background: #fbeaf0;
+  color: #993556;
+  border: 1px solid #f4b8cb;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.message-succes {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2e7d32;
+  margin-top: 8px;
+  text-align: center;
 }

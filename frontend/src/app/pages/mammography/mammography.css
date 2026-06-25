@@ -28,6 +28,14 @@ body {
   font-weight: 700;
   color: #993556;
 }
+.logo-icon {
+  font-size: 22px;
+  color: #fc7b93;
+  /* La largeur définit la taille de votre image */
+  width: 40px;
+  /* height: auto; permet de garder les proportions de votre logo */
+  height: auto;
+}
 
 .logo-ribbon { width: 28px; height: 36px; object-fit: contain; }
 
@@ -467,4 +475,184 @@ body {
 /* RESPONSIVE */
 @media (max-width: 900px) {
   .content-grid { grid-template-columns: 1fr; }
+}
+
+
+.result-label-ia {
+  font-size: 0.9rem;
+  color: #555;
+  margin: 4px 0;
+}
+
+.probabilites-section {
+  margin: 16px 0;
+}
+
+.probabilites-section h4 {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.prob-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.prob-label {
+  width: 90px;
+  font-size: 0.82rem;
+  color: #444;
+  flex-shrink: 0;
+}
+
+.prob-label.prob-highlight {
+  font-weight: 700;
+  color: #222;
+}
+
+.prob-bar-bg {
+  flex: 1;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.prob-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.6s ease;
+}
+
+.prob-fill-cancer { background: #e53935; }
+.prob-fill-normal { background: #43a047; }
+
+.prob-pct {
+  width: 45px;
+  font-size: 0.82rem;
+  text-align: right;
+  color: #555;
+}
+
+/* ═══ GRAD-CAM ══════════════════════════════════════════════════════════════ */
+
+.gradcam-card {
+  margin-top: 1.5rem;
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #e91e8c;
+}
+
+.gradcam-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.gradcam-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #2d2d2d;
+}
+
+.gradcam-badge {
+  background: #fce4f0;
+  color: #e91e8c;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.03em;
+}
+
+.gradcam-hint {
+  font-size: 0.88rem;
+  color: #555;
+  margin-bottom: 1.1rem;
+  line-height: 1.5;
+}
+
+.hot-zone {
+  color: #e53935;
+  font-weight: 600;
+}
+
+.cold-zone {
+  color: #1565c0;
+  font-weight: 600;
+}
+
+.gradcam-images {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.gradcam-img-block {
+  flex: 1;
+  min-width: 160px;
+  text-align: center;
+}
+
+.gradcam-img-label {
+  font-size: 0.8rem;
+  color: #777;
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+}
+
+.gradcam-img {
+  width: 100%;
+  max-width: 340px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  object-fit: contain;
+}
+
+.gradcam-disclaimer {
+  margin-top: 1rem;
+  font-size: 0.78rem;
+  color: #888;
+  font-style: italic;
+}
+
+.result-card.benin {
+  border-left: 4px solid #f59e0b;
+  background: #fffbeb;
+}
+
+.warning-benin {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  color: #92400e;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-top: 1rem;
+  font-size: 0.88rem;
+}
+
+.warning-cancer {
+  background: #fee2e2;
+  border: 1px solid #ef4444;
+  color: #991b1b;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-top: 1rem;
+  font-size: 0.88rem;
+}
+.fill-benin { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+
+.prob-fill-benin { background: #f59e0b; }
+
+.item-benin {
+  background: #fffbeb;
+  border-color: #fde68a;
 }

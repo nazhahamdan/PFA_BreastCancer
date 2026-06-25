@@ -3,6 +3,7 @@ package com.breastcancer.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Entity
 @Table(name = "mammography_analysis")
@@ -22,4 +23,10 @@ public class MammographyAnalysis {
     private Double confidence;
     private LocalDateTime dateAnalyse;
     private String details;
+    private String label;
+
+    @ElementCollection
+    private Map<String, Double> probabilites;
+    @Column(columnDefinition = "LONGTEXT")  // 👈 AJOUTER — base64 peut être long
+    private String gradcamBase64;
 }
