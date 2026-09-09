@@ -1,0 +1,26 @@
+# IDE
+.idea/
+.vscode/
+
+# Logs
+*.log
+hs_err_pid*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dossier model (si trop volumineux pour Git)
+model/
+
+# Backend (à adapter selon ton stack : Java/Node/Python...)
+backend/target/
+backend/node_modules/
+backend/__pycache__/
+backend/.env
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.env

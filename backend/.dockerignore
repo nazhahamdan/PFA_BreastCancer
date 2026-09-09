@@ -1,0 +1,23 @@
+# Build local (regénéré dans le conteneur)
+target/
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Docker
+.dockerignore
+Dockerfile
+
+# Docs
+HELP.md
+README.md
+
+# IDE
+.idea/
+*.iml
+
+# Fichiers de logs
+*.log
+hs_err_pid*.log
