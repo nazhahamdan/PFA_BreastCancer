@@ -22,7 +22,7 @@ export interface MammographyResult {
   providedIn: 'root',
 })
 export class MammographyService {
-  private api = 'http://localhost:8080/api/mammography';
+  private api = '/api/mammography';
 
   constructor(private http: HttpClient) {}
 

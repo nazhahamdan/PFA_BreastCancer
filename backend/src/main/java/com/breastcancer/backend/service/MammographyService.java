@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -35,8 +36,8 @@ public class MammographyService {
     private final PatientRepository     patientRepository;
     private final DiagnosticRepository  diagnosticRepository;
     private final RestTemplate          restTemplate;
-
-    private static final String AI_MODEL_URL = "http://localhost:5000/predict";
+    @Value ("${ai.model.url}")
+    private String aiModelUrl;
     private static final String UPLOAD_DIR   = "uploads/mammography/";
 
     @SuppressWarnings("unchecked")

@@ -30,7 +30,7 @@ export interface CalendrierJourDTO {
   providedIn: 'root',
 })
 export class DiagnosticService {
-    private api = 'http://localhost:8080/api/diagnostics';
+    private api = '/api/diagnostics';
 
   constructor(private http: HttpClient) {}
 

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: breastcancer-app
+data:
+  DB_HOST: "mysql-service"
+  DB_NAME: "breast_cancer_db"
+  AI_MODEL_URL: "http://ai-model-service:5000/predict"
+  APP_ENV: "development"
+  PORT: "8080"
